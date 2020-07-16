@@ -24,6 +24,8 @@ import RaiseHandButton from './RaiseHandButton';
 import ToggleCameraButton from './ToggleCameraButton';
 import styles from './styles';
 import MuteEveryoneElseButton from './MuteEveryoneElseButton';
+import KickEveryoneElseButton from './KickEveryoneElseButton';
+
 
 import { jitsiLocalStorage } from 'js-utils';
 
@@ -176,7 +178,10 @@ class OverflowMenu extends PureComponent<Props, State> {
 
         if(isModerator){
             return(
+                <View>
                 <MuteEveryoneElseButton { ...buttonProps } />
+                <KickEveryoneElseButton { ...buttonProps } />
+                </View>
             );
         }
         return

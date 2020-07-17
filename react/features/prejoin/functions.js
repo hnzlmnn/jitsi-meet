@@ -109,6 +109,16 @@ export function getContentSharingTrack(state: Object): Object {
 }
 
 /**
+ * Selector for determining if the user has chosen to skip prejoin page.
+ *
+ * @param {Object} state - The state of the app.
+ * @returns {boolean}
+ */
+export function isPrejoinSkipped(state: Object) {
+    return state['features/prejoin'].userSelectedSkipPrejoin;
+}
+
+/**
  * Returns the text for the prejoin status bar.
  *
  * @param {Object} state - The state of the app.

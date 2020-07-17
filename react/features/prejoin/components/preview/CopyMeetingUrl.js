@@ -2,11 +2,19 @@
 
 import React, { Component } from 'react';
 
+<<<<<<< HEAD:react/features/prejoin/components/preview/CopyMeetingUrl.js
 import { getCurrentConferenceUrl } from '../../../base/connection';
 import { translate } from '../../../base/i18n';
 import { Icon, IconCopy, IconCheck } from '../../../base/icons';
 import { connect } from '../../../base/redux';
 import logger from '../../logger';
+=======
+import { getCurrentConferenceUrl } from '../../../connection';
+import { translate } from '../../../i18n';
+import { Icon, IconCopy, IconCheck } from '../../../icons';
+import { connect } from '../../../redux';
+import { copyText, getDecodedURI } from '../../../util';
+>>>>>>> master:react/features/base/premeeting/components/web/CopyMeetingUrl.js
 
 type Props = {
 
@@ -159,6 +167,7 @@ class CopyMeetingUrl extends Component<Props, State> {
                 className = 'prejoin-copy-meeting'
                 onMouseEnter = { _showCopyLink }
                 onMouseLeave = { _hideCopyLink }>
+<<<<<<< HEAD:react/features/prejoin/components/preview/CopyMeetingUrl.js
                 <div className = 'prejoin-copy-url'>{url}</div>
                 {showCopyLink && <div
                     className = 'prejoin-copy-badge prejoin-copy-badge--hover'
@@ -181,6 +190,23 @@ class CopyMeetingUrl extends Component<Props, State> {
                     tabIndex = '-1'
                     value = { url } />
             </div>);
+=======
+                <div
+                    className = { `url ${showLinkCopied ? 'done' : ''}` }
+                    onClick = { _copyUrl } >
+                    <div className = 'copy-meeting-text'>
+                        { !showCopyLink && !showLinkCopied && getDecodedURI(url) }
+                        { showCopyLink && t('prejoin.copyAndShare') }
+                        { showLinkCopied && t('prejoin.linkCopied') }
+                    </div>
+                    <Icon
+                        onClick = { _copyUrl }
+                        size = { 24 }
+                        src = { src } />
+                </div>
+            </div>
+        );
+>>>>>>> master:react/features/base/premeeting/components/web/CopyMeetingUrl.js
     }
 }
 

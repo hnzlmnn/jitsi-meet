@@ -386,6 +386,15 @@ var config = {
         // The Amplitude APP Key:
         // amplitudeAPPKey: '<APP_KEY>'
 
+        // Configuration for the rtcstats server:
+        // In order to enable rtcstats one needs to provide a endpoint url.
+        // rtcstatsEndpoint: wss://rtcstats-server-pilot.jitsi.net/,
+
+        // The interval at which rtcstats will poll getStats, defaults to 1000ms.
+        // If the value is set to 0 getStats won't be polled and the rtcstats client
+        // will only send data related to RTCPeerConnection events.
+        // rtcstatsPolIInterval: 1000
+
         // Array of script URLs to load as lib-jitsi-meet "analytics handlers".
         // scriptURLs: [
         //      "libs/analytics-ga.min.js", // google-analytics
@@ -489,6 +498,28 @@ var config = {
 
     // If set to true all muting operations of remote participants will be disabled.
     // disableRemoteMute: true,
+
+    /**
+     External API url used to receive branding specific information.
+     If there is no url set or there are missing fields, the defaults are applied.
+     None of the fields are mandatory and the response must have the shape:
+     {
+         // The hex value for the colour used as background
+         backgroundColor: '#fff',
+         // The url for the image used as background
+         backgroundImageUrl: 'https://example.com/background-img.png',
+         // The anchor url used when clicking the logo image
+         logoClickUrl: 'https://example-company.org',
+         // The url used for the image used as logo
+         logoImageUrl: 'https://example.com/logo-img.png'
+     }
+    */
+    // brandingDataUrl: '',
+
+    // The URL of the moderated rooms microservice, if available. If it
+    // is present, a link to the service will be rendered on the welcome page,
+    // otherwise the app doesn't render it.
+    // moderatedRoomServiceUrl: 'https://moderated.jitsi-meet.example.com',
 
     // List of undocumented settings used in jitsi-meet
     /**

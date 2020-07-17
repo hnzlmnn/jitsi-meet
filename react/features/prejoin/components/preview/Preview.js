@@ -50,6 +50,7 @@ function Preview(props: Props) {
         );
     }
 
+<<<<<<< HEAD:react/features/prejoin/components/preview/Preview.js
     return (
         <div className = 'prejoin-preview prejoin-preview--no-video'>
             <Avatar
@@ -58,6 +59,25 @@ function Preview(props: Props) {
                 size = { 200 } />
         </div>
     );
+=======
+    if (showAvatar) {
+        return (
+            <div
+                className = 'no-video'
+                id = 'preview'>
+                <div className = 'preview-avatar-container'>
+                    <Avatar
+                        className = 'preview-avatar'
+                        displayName = { name }
+                        participantId = 'local'
+                        size = { 200 } />
+                </div>
+            </div>
+        );
+    }
+
+    return null;
+>>>>>>> master:react/features/base/premeeting/components/web/Preview.js
 }
 
 /**

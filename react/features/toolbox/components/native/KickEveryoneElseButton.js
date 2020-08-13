@@ -2,6 +2,7 @@
 
 import { type Dispatch } from 'redux';
 
+import { openDialog } from '../../../base/dialog';
 import { translate } from '../../../base/i18n';
 import { IconKick } from '../../../base/icons';
 import {
@@ -11,8 +12,9 @@ import {
 import { connect } from '../../../base/redux';
 import { AbstractButton } from '../../../base/toolbox';
 import type { AbstractButtonProps } from '../../../base/toolbox';
+
 import KickEveryoneElsePrompt from './KickEveryoneElsePrompt';
-import { openDialog } from '../../../base/dialog';
+
 /**
  * The type of the React {@code Component} props of {@link KickEveryoneElseButton}.
  */
@@ -23,7 +25,7 @@ type Props = AbstractButtonProps & {
      */
     _localParticipant: Object,
 
-  
+
     /**
      * The redux {@code dispatch} function.
      */
@@ -49,7 +51,6 @@ class KickEveryoneElseButton extends AbstractButton<Props, *> {
         this._kickEveryoneElse();
     }
 
-  
 
     /**
      * Toggles the rased hand status of the local participant.
@@ -57,17 +58,17 @@ class KickEveryoneElseButton extends AbstractButton<Props, *> {
      * @returns {void}
      */
     _kickEveryoneElse() {
-        console.log("kick all")
-        exclude= [this.props._localParticipant.id];
+        console.log('kick all');
+        exclude = [ this.props._localParticipant.id ];
         this.props.dispatch(openDialog(KickEveryoneElsePrompt, {
-            exclude,
+            exclude
         }));
-            
 
-        
+
     }
 
 }
+
 /**
  * Maps part of the Redux state to the props of this component.
  *

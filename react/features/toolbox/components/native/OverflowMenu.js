@@ -1,5 +1,6 @@
 // @flow
 
+import { jitsiLocalStorage } from '@jitsi/js-utils';
 import React, { PureComponent } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import Collapsible from 'react-native-collapsible';
@@ -13,7 +14,7 @@ import { SharedDocumentButton } from '../../../etherpad';
 import { InviteButton } from '../../../invite';
 import { LobbyModeButton } from '../../../lobby/components/native';
 import { AudioRouteButton } from '../../../mobile/audio-mode';
-import { LiveStreamButton, RecordButton } from '../../../recording';
+import { LiveStreamButton } from '../../../recording';
 import { RoomLockButton } from '../../../room-lock';
 import { ClosedCaptionButton } from '../../../subtitles';
 import { TileViewButton } from '../../../video-layout';
@@ -21,16 +22,13 @@ import { VideoShareButton } from '../../../youtube-player';
 import HelpButton from '../HelpButton';
 
 import AudioOnlyButton from './AudioOnlyButton';
+import IOSRecordButtonWrapper from './IOSRecordButtonWrapper';
+import KickEveryoneElseButton from './KickEveryoneElseButton';
 import MoreOptionsButton from './MoreOptionsButton';
+import MuteEveryoneElseButton from './MuteEveryoneElseButton';
 import RaiseHandButton from './RaiseHandButton';
 import ToggleCameraButton from './ToggleCameraButton';
 import styles from './styles';
-import MuteEveryoneElseButton from './MuteEveryoneElseButton';
-import KickEveryoneElseButton from './KickEveryoneElseButton';
-
-import { jitsiLocalStorage } from '@jitsi/js-utils';
-
-import IOSRecordButtonWrapper from './IOSRecordButtonWrapper';
 
 
 /**
@@ -106,25 +104,25 @@ class OverflowMenu extends PureComponent<Props, State> {
         this._onSwipe = this._onSwipe.bind(this);
         this._onToggleMenu = this._onToggleMenu.bind(this);
         this._renderMenuExpandToggle = this._renderMenuExpandToggle.bind(this);
-        this._renderModeratorButtons = this._renderModeratorButtons.bind(this)
+        this._renderModeratorButtons = this._renderModeratorButtons.bind(this);
 
-        var sessionId = jitsiLocalStorage.getItem('sessionId');
-        console.log(jitsiLocalStorage.getItem('sessionId'))
-        if(sessionId){
+        const sessionId = jitsiLocalStorage.getItem('sessionId');
+
+        if (sessionId) {
             this.state = {
                 scrolledToTop: true,
                 showMore: false,
-                isModerator:true
+                isModerator: true
 
             };
-        }else{ 
+        } else {
             this.state = {
                 scrolledToTop: true,
                 showMore: false,
-                isModerator:false
+                isModerator: false
 
             };
-         }
+        }
     }
 
     /**
@@ -134,9 +132,8 @@ class OverflowMenu extends PureComponent<Props, State> {
      * @returns {ReactElement}
      */
     render() {
-        const { _bottomSheetStyles, __localVideo } = this.props;
+        const { _bottomSheetStyles } = this.props;
         const { showMore } = this.state;
-        let {dispatch} = this.props;
         const buttonProps = {
             afterClick: this._onCancel,
             showLabel: true,
@@ -161,7 +158,7 @@ class OverflowMenu extends PureComponent<Props, State> {
                 <LobbyModeButton { ...buttonProps } />
                 <MoreOptionsButton { ...moreOptionsButtonProps } />
                 <Collapsible collapsed = { !showMore }>
-                {this._renderModeratorButtons(buttonProps)}          
+                    {this._renderModeratorButtons(buttonProps)}
                     <ToggleCameraButton { ...buttonProps } />
                     <TileViewButton { ...buttonProps } />
                     <LiveStreamButton { ...buttonProps } />
@@ -182,18 +179,19 @@ class OverflowMenu extends PureComponent<Props, State> {
 
     _renderModeratorButtons: () => React$Element<any>;
 
-    _renderModeratorButtons(buttonProps){
+    _renderModeratorButtons(buttonProps) {
         const { isModerator } = this.state;
 
-        if(isModerator){
-            return(
+        if (isModerator) {
+            return (
                 <View>
-                <MuteEveryoneElseButton { ...buttonProps } />
-                <KickEveryoneElseButton { ...buttonProps } />
+                    <MuteEveryoneElseButton { ...buttonProps } />
+                    <KickEveryoneElseButton { ...buttonProps } />
                 </View>
             );
         }
-        return
+
+        return;
 
     }
     _renderMenuExpandToggle: () => React$Element<any>;
@@ -272,7 +270,7 @@ class OverflowMenu extends PureComponent<Props, State> {
      * @returns {void}
      */
     _onToggleMenu() {
-        console.log(this)
+        console.log(this);
         this.setState({
             showMore: !this.state.showMore
         });
@@ -288,6 +286,7 @@ class OverflowMenu extends PureComponent<Props, State> {
  */
 function _mapStateToProps(state) {
     let { desktopSharingEnabled } = state['features/base/conference'];
+
     if (state['features/base/config'].enableFeaturesBasedOnToken) {
         // we enable desktop sharing if any participant already have this
         // feature enabled
@@ -295,6 +294,7 @@ function _mapStateToProps(state) {
             .find(({ features = {} }) =>
                 String(features['screen-sharing']) === 'true') !== undefined;
     }
+
     return {
         __localVideo: state['features/base/tracks'],
         _bottomSheetStyles: ColorSchemeRegistry.get(state, 'BottomSheet'),

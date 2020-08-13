@@ -13,8 +13,8 @@ import { isRoomValid, SET_ROOM } from '../conference';
 import JitsiMeetJS from '../lib-jitsi-meet';
 import { MiddlewareRegistry } from '../redux';
 import { getPropertyValue } from '../settings';
-import { setTrackMuted, TRACK_ADDED } from '../tracks';
-import { getLocalVideoTrack } from '../tracks';
+import { setTrackMuted, TRACK_ADDED, getLocalVideoTrack } from '../tracks';
+
 
 import { setAudioMuted, setCameraFacingMode, setVideoMuted } from './actions';
 import {
@@ -75,6 +75,7 @@ MiddlewareRegistry.register(store => next => action => {
  */
 function _appStateChanged({ dispatch, getState }, next, action) {
     const localVideo = getLocalVideoTrack(getState()['features/base/tracks']);
+
     if (localVideo && localVideo.videoType === 'desktop') {
         return next(action);
     }

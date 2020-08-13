@@ -100,11 +100,9 @@ class SettingsView extends AbstractSettingsView<Props, State> {
     constructor(props) {
         super(props);
         const {
-            disableCallIntegration,
             disableCrashReporting,
             disableP2P,
             displayName,
-            email,
             serverURL,
             startWithAudioMuted,
             startWithVideoMuted
@@ -115,7 +113,7 @@ class SettingsView extends AbstractSettingsView<Props, State> {
             disableCrashReporting,
             disableP2P,
             displayName,
-            email:'',
+            email: '',
             serverURL,
             showAdvanced: true,
             startWithAudioMuted,
@@ -131,7 +129,7 @@ class SettingsView extends AbstractSettingsView<Props, State> {
         this._onShowAdvanced = this._onShowAdvanced.bind(this);
         this._setURLFieldReference = this._setURLFieldReference.bind(this);
         this._showURLAlert = this._showURLAlert.bind(this);
-       
+
     }
 
 
@@ -142,7 +140,7 @@ class SettingsView extends AbstractSettingsView<Props, State> {
      * @returns {ReactElement}
      */
     render() {
-        const { displayName, email, serverURL, startWithAudioMuted, startWithVideoMuted } = this.state;
+        const { displayName, serverURL, startWithAudioMuted, startWithVideoMuted } = this.state;
 
         return (
             <JitsiModal
@@ -164,7 +162,7 @@ class SettingsView extends AbstractSettingsView<Props, State> {
                             placeholder = 'John Doe'
                             value = { displayName } />
                     </FormRow>
-                   
+
                     <FormSectionHeader
                         label = 'settingsView.conferenceSection' />
                     <FormRow
@@ -326,8 +324,9 @@ class SettingsView extends AbstractSettingsView<Props, State> {
      */
     _onClose() {
         this.setState({ showAdvanced: false });
-        this.setState({email:''})
-        this._onChangeEmail('')
+        this.setState({ email: '' });
+        this._onChangeEmail('');
+
         return this._processServerURL(true /* hideOnSuccess */);
     }
 

@@ -29,7 +29,7 @@ MiddlewareRegistry.register(({ dispatch, getState }) => next => action => {
 
             dispatch(setDocumentEditingState(editing));
 
-                dispatch(setActiveModalId(SHARE_DOCUMENT_VIEW_ID));
+            dispatch(setActiveModalId(SHARE_DOCUMENT_VIEW_ID));
         } else {
             APP.UI.emitEvent(UIEvents.ETHERPAD_CLICKED);
         }

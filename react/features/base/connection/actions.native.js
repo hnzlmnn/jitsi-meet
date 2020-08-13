@@ -3,6 +3,7 @@
 import _ from 'lodash';
 import type { Dispatch } from 'redux';
 
+import { setDesktopSharingEnabled } from '../conference';
 import { conferenceLeft, conferenceWillLeave } from '../conference/actions';
 import { getCurrentConference } from '../conference/functions';
 import JitsiMeetJS, { JitsiConnectionEvents } from '../lib-jitsi-meet';
@@ -20,7 +21,6 @@ import {
 } from './actionTypes';
 import { JITSI_CONNECTION_URL_KEY } from './constants';
 import logger from './logger';
-import { setDesktopSharingEnabled } from '../conference';
 
 /**
  * The error structure passed to the {@link connectionFailed} action.
@@ -129,8 +129,10 @@ export function connect(id: ?string, password: ?string) {
             connection.removeEventListener(
                 JitsiConnectionEvents.CONNECTION_ESTABLISHED,
                 _onConnectionEstablished);
+
             // Enable desktop sharing.
             const isDesktopSharingEnabled = JitsiMeetJS.isDesktopSharingEnabled();
+
             dispatch(setDesktopSharingEnabled(isDesktopSharingEnabled));
             dispatch(connectionEstablished(connection, Date.now()));
         }

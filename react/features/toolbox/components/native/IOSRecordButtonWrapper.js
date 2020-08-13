@@ -1,22 +1,30 @@
 // @flow
-import React, {PureComponent} from 'react';
-import RecordNativeComponent from './IOSRecordButton';
+import React, { PureComponent } from 'react';
 
+
+import { createTaskQueue } from '../../../../../modules/util/helpers';
 import { translate } from '../../../base/i18n';
-import { IconShareDesktop } from '../../../base/icons';
+import { JitsiTrackErrors, JitsiTrackEvents } from '../../../base/lib-jitsi-meet';
 import {
     connect,
     MiddlewareRegistry
 } from '../../../base/redux';
-
-import { getLocalTrack, getLocalVideoTrack, createLocalTracksF, replaceLocalTrack } from '../../../base/tracks';
-import { createTaskQueue } from '../../../../../modules/util/helpers';
+import {
+    getLocalTrack,
+    getLocalVideoTrack,
+    createLocalTracksF,
+    replaceLocalTrack,
+    TRACK_CREATE_ERROR,
+    TRACK_CREATE_CANCELED
+} from '../../../base/tracks';
 import {
     TRACK_WILL_CREATE
 } from '../../../base/tracks/actionTypes';
-import { JitsiTrackErrors, JitsiTrackEvents } from '../../../base/lib-jitsi-meet';
+
+import RecordNativeComponent from './IOSRecordButton';
 
 type Props = {
+
      /**
      * Whether the current conference is in audio only mode or not.
      */
@@ -29,34 +37,26 @@ type Props = {
 };
 type State = {};
 
-class IOSRecordButtonWrapper extends PureComponent<Props,*> {
+/**
+ * An implementation of the wrapper for native screen recording button for ios
+ */
+class IOSRecordButtonWrapper extends PureComponent<Props, State> {
 
-    recordingStarted = () => {
-        console.log("create tracks for screen sharing and make way for the frames");
-        this.props.dispatch({ type: 'START_SCREEN_SHARING' });
-    }
-
-    recordingEnded = () => {
-        console.log("switch back to camera track");
-        // do we need to worry about messed up states? 
-        // would diff start stop dispatches be better?
-        this.props.dispatch({ type: 'END_SCREEN_SHARING' });
-    }
-
+    /**
+     * Implements React's {@link Component#render()}.
+     *
+     * @inheritdoc
+     * @returns {ReactElement}
+     */
     render() {
-        return <RecordNativeComponent
-            // send button label in props to maintain translated strings in react native
-            onStart={() => {this.recordingStarted();}}
-            onEnd={() => {this.recordingEnded();}}
-            style={{width: 200, height: 36}}
-            ref={comp => { this.recordComponent = comp; }} 
-        />
+        return (<RecordNativeComponent
+            style = {{ width: 200, height: 36 }} />);
     }
 }
 
 
 /**
- * Maps (parts of) the redux state to {@link DesktopSharingButton}'s React {@code Component}
+ * Maps (parts of) the redux state to {@link IOSRecordButtonWrapper}'s React {@code Component}
  * props.
  *
  * @param {Object} state - The redux store/state.
@@ -100,11 +100,12 @@ MiddlewareRegistry.register(store => next => action => {
     case 'END_SCREEN_SHARING':
         _untoggleScreenSharing(store);
         break;
-    
+
     case 'START_SCREEN_SHARING':
         _toggleScreenSharing(store);
         break;
     }
+
     return next(action);
 });
 
@@ -112,14 +113,20 @@ MiddlewareRegistry.register(store => next => action => {
  * Toggles between screen sharing and camera video if the toggle parameter
  * is not specified and starts the procedure for obtaining new screen
  * sharing/video track otherwise.
+ *
+ * @param {Store} store - The redux store.
+ * @returns {void}
  */
 function _toggleScreenSharing(store) {
     const state = store.getState();
+
     if (!videoSwitchInProgress) {
         const tracks = state['features/base/tracks'];
         const localVideo = getLocalVideoTrack(tracks);
+
         if (localVideo && localVideo.videoType === 'desktop') {
             _untoggleScreenSharing(store);
+
             return;
         }
         _switchToScreenSharing(store, tracks, localVideo);
@@ -129,6 +136,11 @@ function _toggleScreenSharing(store) {
 /**
  * Tries to switch to the screensharing mode by disposing camera stream and
  * replacing it with a desktop one.
+ *
+ * @param {Store} store - Application redux store.
+ * @param {{}} tracks - Video tracks available.
+ * @param {{}} localVideo - Current video track.
+ * @returns {void}
  */
 function _switchToScreenSharing(store, tracks, localVideo) {
     videoSwitchInProgress = true;
@@ -137,16 +149,26 @@ function _switchToScreenSharing(store, tracks, localVideo) {
     wasVideoMuted = !localVideo || localVideo.muted;
     createLocalTrackF(store, tracks, 'desktop').then(desktopStream => {
         desktopStream.on(JitsiTrackEvents.LOCAL_TRACK_STOPPED, () => _untoggleScreenSharing(store));
+
         return desktopStream;
-    }).then(stream => useVideoStream(store.dispatch, localVideo, stream)).then(() => { videoSwitchInProgress = false; }).catch(() => {
-        videoSwitchInProgress = false, _untoggleScreenSharing(store);
     })
+    .then(stream => useVideoStream(store.dispatch, localVideo, stream))
+    .then(() => {
+        videoSwitchInProgress = false;
+    })
+    .catch(() => {
+        videoSwitchInProgress = false;
+        _untoggleScreenSharing(store);
+    });
 }
 
 /**
  * Request to start capturing local audio and/or video. By default, the user
  * facing camera will be selected.
- * 
+ *
+ * @param {{}} _ - Dipatch and getState.
+ * @param {Array} tracks - List of tracks.
+ * @param {{}} device - Audio/Video device.
  * @returns {Promise}
  */
 function createLocalTrackF({ dispatch, getState }, tracks, device) {
@@ -161,14 +183,20 @@ function createLocalTrackF({ dispatch, getState }, tracks, device) {
     // to implement them) and the right thing to do is to ask for each
     // device separately.
     const track = getLocalTrack(tracks, device === 'audio' ? 'audio' : 'video', /* includePending */ true);
+
     if (track) {
-        if (track.mediaType == 'audio' || (device === 'video' && track.videoType !== 'desktop') || (device !== 'video' && track.videoType === 'desktop')) {
-            let err = new Error(`Local track for ${device} already exists.`);
+        if (track.mediaType === 'audio' || (device === 'video'
+            && track.videoType !== 'desktop') || (device !== 'video'
+            && track.videoType === 'desktop')) {
+            const err = new Error(`Local track for ${device} already exists.`);
+
             err.name = 'LOCAL_TRACK_EXISTS';
+
             return Promise.reject(err);
         }
     }
-    const gumProcess = createLocalTracksF({ devices: [ device ] }, false, { dispatch, getState }).then(localTracks => {
+    const gumProcess = createLocalTracksF({ devices: [ device ] }, false, { dispatch,
+        getState }).then(localTracks => {
         // Because GUM is called for 1 device (which is actually
         // a media type 'audio', 'video', 'screen', etc.) we
         // should not get more than one JitsiTrack.
@@ -197,21 +225,23 @@ function createLocalTrackF({ dispatch, getState }, tracks, device) {
                 throw new Error();
             });
         }
+
         return localTracks[0];
-    }).catch(error => {
-        dispatch(gumProcess.canceled ? {
-            type: TRACK_CREATE_CANCELED,
-            trackType: device
-        } : dispatch => {
-            if (error) {
-                dispatch({
-                    type: TRACK_CREATE_ERROR,
-                    permissionDenied: error.name === 'SecurityError',
-                    trackType: device
-                });
-            }
-        })
+    })
+.catch(error => {
+    dispatch(gumProcess.canceled ? {
+        type: TRACK_CREATE_CANCELED,
+        trackType: device
+    } : _dispatch => {
+        if (error) {
+            _dispatch({
+                type: TRACK_CREATE_ERROR,
+                permissionDenied: error.name === 'SecurityError',
+                trackType: device
+            });
+        }
     });
+});
 
     /**
      * Cancels the {@code getUserMedia} process represented by this
@@ -240,13 +270,18 @@ function createLocalTrackF({ dispatch, getState }, tracks, device) {
 /**
  * Start using provided video stream.
  * Stops previous video stream.
- * @param {JitsiLocalTrack} [stream] new stream to use or null
+ *
+ * @param {Dispatch} dispatch - Redux dispatch.
+ * @param {VideoTrack} localVideo - Video track.
+ * @param {JitsiLocalTrack} [newStream] - New stream to use or null.
  * @returns {Promise}
  */
 function useVideoStream(dispatch, localVideo = { }, newStream) {
     return new Promise((resolve, reject) => {
         _replaceLocalVideoTrackQueue.enqueue(_onTaskComplete => {
-            dispatch(replaceLocalTrack(localVideo.jitsiTrack, newStream)).then(resolve).catch(reject).then(_onTaskComplete);
+            dispatch(replaceLocalTrack(localVideo.jitsiTrack, newStream)).then(resolve)
+            .catch(reject)
+            .then(_onTaskComplete);
         });
     });
 }
@@ -255,28 +290,39 @@ function useVideoStream(dispatch, localVideo = { }, newStream) {
 /**
  * Turns off the screen sharing and restores
  * the previous state described by the arguments.
+ *
+ * @param {{}} _ - Dispatch and getState.
+ * @returns {void}
  */
 function _untoggleScreenSharing({ dispatch, getState }) {
     videoSwitchInProgress = true;
     const tracks = getState()['features/base/tracks'];
     const localVideo = getLocalVideoTrack(tracks);
     let promise;
+
     if (didHaveVideo) {
-        promise = createLocalTrackF({ dispatch, getState }, tracks, 'video')
+        promise = createLocalTrackF({ dispatch,
+            getState }, tracks, 'video')
             .then(stream => useVideoStream(dispatch, localVideo, stream)
                 .then(() => stream))
-                    .then(localVideo => {
-            if (wasVideoMuted) {
-                localVideo.mute();
-            }
-        }).catch(error => {
-            // Still fail with the original err
-            return error.name === 'LOCAL_TRACK_EXISTS' ? Promise.reject(error) : useVideoStream(dispatch, localVideo, null).then(() => {
-                throw error;
+                    .then(_localVideo => {
+                        if (wasVideoMuted) {
+                            _localVideo.mute();
+                        }
+                    })
+            .catch(error => {
+                // Still fail with the original err
+                error.name === 'LOCAL_TRACK_EXISTS' ? Promise.reject(error)
+                    : useVideoStream(dispatch, localVideo, null).then(() => {
+                        throw error;
+                    });
             });
-        });
     } else {
         promise = useVideoStream(dispatch, localVideo, null);
     }
-    promise.then(() => { videoSwitchInProgress = false; }).catch(error => { videoSwitchInProgress = false; });
+    promise.then(() => {
+        videoSwitchInProgress = false;
+    }).catch(() => {
+        videoSwitchInProgress = false;
+    });
 }

@@ -6,6 +6,7 @@ import type { Dispatch } from 'redux';
 import { ConfirmDialog, hideDialog } from '../../../base/dialog';
 import { connect } from '../../../base/redux';
 import { kickAllParticipants } from '../../../remote-video-menu/actions';
+
 /**
  * The type of the React {@code Component} props of {@link RoomLockPrompt}.
  */
@@ -54,8 +55,7 @@ class KickEveryoneElsePrompt extends Component<Props> {
             <ConfirmDialog
                 contentKey = 'toolbar.accessibilityLabel.kickEveryone'
                 onCancel = { this._onCancel }
-                onSubmit = { this._onSubmit }
-                />
+                onSubmit = { this._onSubmit } />
         );
     }
 
@@ -70,7 +70,8 @@ class KickEveryoneElsePrompt extends Component<Props> {
     _onCancel() {
         // An undefined password is understood to cancel the request to lock the
         // conference/room.
-        this.props.dispatch(hideDialog(KickEveryoneElsePrompt))
+        this.props.dispatch(hideDialog(KickEveryoneElsePrompt));
+
         return true;
     }
 
@@ -79,7 +80,8 @@ class KickEveryoneElsePrompt extends Component<Props> {
     /**
      * Notifies this prompt that it has been dismissed by submitting a specific
      * value.
-     * TODO: Fix the comments
+     * TODO: Fix the comments.
+     *
      * @param {string|undefined} value - The submitted value.
      * @private
      * @returns {boolean} False because we do not want to hide this
@@ -87,11 +89,11 @@ class KickEveryoneElsePrompt extends Component<Props> {
      * after setting the password is resolved.
      */
     _onSubmit() {
-       this.props.dispatch(kickAllParticipants(exclude));
-       this.props.dispatch(hideDialog(KickEveryoneElsePrompt))
+        this.props.dispatch(kickAllParticipants(exclude));
+        this.props.dispatch(hideDialog(KickEveryoneElsePrompt));
 
 
-        return true; 
+        return true;
     }
 
 }

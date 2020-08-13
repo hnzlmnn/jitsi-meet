@@ -78,9 +78,11 @@ function _mapStateToProps(state): Object {
     const localVideo = getLocalVideoTrack(tracks);
 
     let visible = !videoMuted;
+
     if (localVideo && localVideo.videoType === 'desktop') {
         visible = false;
     }
+
     return {
         _audioOnly: Boolean(audioOnly),
         _videoMuted: videoMuted,

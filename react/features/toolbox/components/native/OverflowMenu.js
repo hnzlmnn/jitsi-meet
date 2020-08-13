@@ -18,7 +18,7 @@ import { LiveStreamButton } from '../../../recording';
 import { RoomLockButton } from '../../../room-lock';
 import { ClosedCaptionButton } from '../../../subtitles';
 import { TileViewButton } from '../../../video-layout';
-import { VideoShareButton } from '../../../youtube-player';
+import { VideoShareButton } from '../../../youtube-player/components';
 import HelpButton from '../HelpButton';
 
 import AudioOnlyButton from './AudioOnlyButton';

@@ -83,11 +83,11 @@ export function muteAllParticipants(exclude: Array<string>) {
 }
 
 /**
- * Kicks the remote participant with the given ID.
- *
- * @param {string} participantId - ID of the participant to kick.
- * @returns {Function}
- */
+* Kicks the remote participant with the given ID.
+*
+* @param {string} participantId - ID of the participant to kick.
+* @returns {Function}
+*/
 export function kickRemote(participantId: string) {
     return (dispatch: Dispatch<any>) => {
         sendAnalytics(createRemoteMuteConfirmedEvent(participantId));
@@ -96,11 +96,11 @@ export function kickRemote(participantId: string) {
 }
 
 /**
- * Kicks all participants.
- *
- * @param {Array<string>} exclude - Array of participant IDs to not mute.
- * @returns {Function}
- */
+* Kicks all participants.
+*
+* @param {Array<string>} exclude - Array of participant IDs to not mute.
+* @returns {Function}
+*/
 export function kickAllParticipants(exclude: Array<string>) {
     return (dispatch: Dispatch<any>, getState: Function) => {
         const state = getState();

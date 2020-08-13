@@ -8,8 +8,8 @@ import { appNavigate } from '../../app/actions';
 import { disconnect } from '../../base/connection';
 import { translate } from '../../base/i18n';
 import { connect } from '../../base/redux';
-import { AbstractHangupButton } from '../../base/toolbox';
-import type { AbstractButtonProps } from '../../base/toolbox';
+import { AbstractHangupButton } from '../../base/toolbox/components';
+import type { AbstractButtonProps } from '../../base/toolbox/components';
 
 import { ScreenShareController } from './native/IOSRecordButton';
 
